@@ -10,6 +10,11 @@
 
 Adafruit_INA219 ina219(0x40);
 
+uint8_t voltage_divider_pin = A0;
+float voltage_V = 0; 
+uint16_t current_mA = 0;
+float power_W = 0;
+float energy_Wh_d = 0;
 
 void setup(void) 
 {
@@ -18,42 +23,29 @@ void setup(void)
   {
     delay(10);
   }
-  
-  // Initialize the INA219.
-  // By default the initialization will use the largest range (32V, 2A).  However
-  // you can call a setCalibration function to change this range (see comments).
-  if (! ina219.begin()) {
-    Serial.println("Failed to find INA219 chip");
+
+  if (! ina219.begin()) 
+  {
+    Serial.println("Failed to find INA219 current meter");
     while (1) { delay(10); }
   }
-  // To use a slightly lower 32V, 1A range (higher precision on amps):
+
   //ina219.setCalibration_32V_1A();
-  // Or to use a lower 16V, 400mA range (higher precision on volts and amps):
   //ina219.setCalibration_16V_400mA();
 
-  Serial.println("Measuring voltage and current with INA219 ...");
 }
 
 void loop(void) 
 {
-  float shuntvoltage = 0;
-  float busvoltage = 0;
-  float current_mA = 0;
-  float loadvoltage = 0;
-  float power_mW = 0;
-
-  shuntvoltage = ina219.getShuntVoltage_mV();
-  busvoltage = ina219.getBusVoltage_V();
+  voltage_V = analogRead(voltage_divider_pin) / (10.24);
   current_mA = ina219.getCurrent_mA();
-  power_mW = ina219.getPower_mW();
-  loadvoltage = busvoltage + (shuntvoltage / 1000);
-  
-  Serial.print("Bus Voltage:   "); Serial.print(busvoltage); Serial.println(" V");
-  Serial.print("Shunt Voltage: "); Serial.print(shuntvoltage); Serial.println(" mV");
-  Serial.print("Load Voltage:  "); Serial.print(loadvoltage); Serial.println(" V");
-  Serial.print("Current:       "); Serial.print(current_mA); Serial.println(" mA");
-  Serial.print("Power:         "); Serial.print(power_mW); Serial.println(" mW");
-  Serial.println("");
+  power_W = voltage_V * current_mA / 1000;
+  energy_Wh_d = power_W * 3600 * 9;
 
-  delay(2000);
+  Serial.print("Voltage: "); Serial.print(voltage_V, 1);  Serial.print(" V,   ");
+  Serial.print("Current: "); Serial.print(current_mA); Serial.print(" mA,   ");
+  Serial.print("Power: "); Serial.print(power_W); Serial.print(" W,   ");
+  Serial.print("Energy: "); Serial.print(energy_Wh_d, 0); Serial.println(" Whr/day");
+
+  delay(1000);
 }
