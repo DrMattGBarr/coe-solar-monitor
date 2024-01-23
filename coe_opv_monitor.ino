@@ -17,12 +17,14 @@
 #define TFT_MISO 12
 #define TFT_MOSI 11
 #define TFT_CS   10
-#define TFT_DC   8
 #define TFT_RST  9
+#define TFT_DC   8
 
-// Global variables
+// External library objects
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
 Adafruit_INA219 ina219(0x40);
+
+// Global variables
 uint8_t voltage_divider_pin = A0;
 uint16_t update_period = 250;
 unsigned long time_now = 0;
@@ -61,10 +63,13 @@ void setup(void) {
   tft.initR(INITR_BLACKTAB); 
   tft.fillScreen(ST77XX_BLACK);
   tft.setRotation(1);
-  drawText(10, 50, 2, "OPV Testing", ST77XX_WHITE, ST77XX_BLACK);
-  delay(1000);
+  drawText(52, 10, 3, "OPV", ST77XX_WHITE, ST77XX_BLACK);
+  drawText(18, 40, 3, "Testing", ST77XX_WHITE, ST77XX_BLACK);
+  drawText(40, 90, 2, "by ANFF", ST77XX_WHITE, ST77XX_BLACK);
+  delay(3000);
   tft.fillScreen(ST77XX_BLACK);
-  
+  drawText(2, 74, 3, "Kardinia", ST77XX_GREEN, ST77XX_BLACK);
+  drawText(2, 102, 3, "Energy", ST77XX_GREEN, ST77XX_BLACK);
 }
 
 
