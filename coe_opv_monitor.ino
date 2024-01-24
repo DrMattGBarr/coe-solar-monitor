@@ -1,6 +1,6 @@
 /***************************************************
    ANFF OPV Solar Monitor
-   Date: 23-01-2024
+   Date: 25-01-2024
    Author: Matthew G. Barr
    Project: Bangkok OPV demonstrator
 
@@ -19,6 +19,7 @@
 #define TFT_CS   10
 #define TFT_RST  9
 #define TFT_DC   8
+#define TFT_LITE 6
 
 // External library objects
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
@@ -50,21 +51,39 @@ char energy_units[8] = "Wh/day";
 
 void setup(void) {
   Serial.begin(115200);
-  while (!Serial){
-    delay(10);
-  }
+  pinMode(TFT_LITE, OUTPUT);
+
+  //ina219.setCalibration_32V_1A();
+  tft.initR(INITR_BLACKTAB); 
+  digitalWrite(TFT_LITE, HIGH);
+  tft.fillScreen(ST77XX_BLACK);
+  tft.setRotation(3);
+  drawText(2, 5, 1, "Connecting to INA219..." ,ST77XX_WHITE, ST77XX_BLACK);
+  delay(250);
 
   if (! ina219.begin()) {
+    drawText(2, 18, 1, "Failed to connect.", ST77XX_WHITE, ST77XX_BLACK);
     Serial.println("Error: failed to find INA219 current meter.");
     while (1) { delay(10); }
   }
 
-  //ina219.setCalibration_32V_1A();
-  tft.initR(INITR_BLACKTAB); 
+  drawText(2, 18, 1, "Connected." ,ST77XX_WHITE, ST77XX_BLACK);
+  delay(250);
+
+  drawText(2, 31, 1, "Connecting serial..." ,ST77XX_WHITE, ST77XX_BLACK);
+  while (!Serial){
+    delay(10);
+  }
+
+  delay(250);
+  drawText(2, 44, 1, "Connected." ,ST77XX_WHITE, ST77XX_BLACK);
+  delay(250);
+  drawText(2, 57, 1, "Firmware version: 1.01" ,ST77XX_WHITE, ST77XX_BLACK);
+  delay(500);
   tft.fillScreen(ST77XX_BLACK);
-  tft.setRotation(1);
+
   drawText(52, 10, 3, "OPV", ST77XX_WHITE, ST77XX_BLACK);
-  drawText(18, 40, 3, "Testing", ST77XX_WHITE, ST77XX_BLACK);
+  drawText(22, 40, 3, "Tester", ST77XX_WHITE, ST77XX_BLACK);
   drawText(40, 90, 2, "by ANFF", ST77XX_WHITE, ST77XX_BLACK);
   delay(3000);
   tft.fillScreen(ST77XX_BLACK);
@@ -78,12 +97,15 @@ void loop(void)
   if((millis() - time_now) > update_period) {
     time_now = millis();
     
-    voltage_V = analogRead(voltage_divider_pin) / (10.24);
+    voltage_V = analogRead(voltage_divider_pin) / (10.24 * 1.15);
     dtostrf(voltage_V, 5, 1, voltage);
 
     current_mA = ina219.getCurrent_mA();
     if (current_mA <= 0) {
       current_mA = 0;
+    }
+    else if (current_mA > 3000) {
+      current_mA = 3000;
     }
     dtostrf(current_mA, 5, 0, current);
     
@@ -118,7 +140,7 @@ void loop(void)
 }
 
 
-void drawText(int x_pos, int y_pos, int text_size, String text_literal, uint16_t text_colour, uint16_t text_background_colour) {
+void drawText(uint8_t x_pos, uint8_t y_pos, uint8_t text_size, String text_literal, uint16_t text_colour, uint16_t text_background_colour) {
   tft.setCursor(x_pos, y_pos);
   tft.setTextColor(text_colour, text_background_colour);
   tft.setTextSize(text_size);
