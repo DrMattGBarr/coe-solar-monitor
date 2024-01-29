@@ -33,7 +33,7 @@ float voltage_V = 0;
 uint16_t current_mA = 0;
 float power_W = 0;
 float energy_Wh_d = 0;
-float energy_scaling_factor = 6.4;
+float energy_scaling_factor = 5.0;
 
 // Preallocated char arrays
 char current[6];
@@ -47,7 +47,7 @@ char power_label[8] = "Power: ";
 char power_units[2] = "W";
 char energy[6];
 char energy_label[9] = "Energy: ";
-char energy_units[10] = "Wh/m2/day";
+char energy_units[7] = "Wh/day";
 
 
 void setup(void) {
@@ -79,7 +79,7 @@ void setup(void) {
   delay(250);
   drawText(2, 44, 1, "Connected." ,ST77XX_WHITE, ST77XX_BLACK);
   delay(250);
-  drawText(2, 57, 1, "Firmware version: 1.01" ,ST77XX_WHITE, ST77XX_BLACK);
+  drawText(2, 57, 1, "Firmware version: 1.02" ,ST77XX_WHITE, ST77XX_BLACK);
   delay(500);
   tft.fillScreen(ST77XX_BLACK);
 
@@ -119,7 +119,7 @@ void loop(void)
     // Serial.print("Voltage: "); Serial.print(voltage_V, 1);  Serial.print(" V,   ");
     // Serial.print("Current: "); Serial.print(current_mA); Serial.print(" mA,   ");
     // Serial.print("Power: "); Serial.print(power_W); Serial.print(" W,   ");
-    // Serial.print("Energy: "); Serial.print(energy_Wh_d, 0); Serial.println(" Wh/m2/day");
+    // Serial.print("Energy: "); Serial.print(energy_Wh_d, 0); Serial.println(" Wh/day");
 
     drawText(2, 5, 1, voltage_label, ST77XX_WHITE, ST77XX_BLACK);
     drawText(50, 5, 1, voltage, ST77XX_WHITE, ST77XX_BLACK);
