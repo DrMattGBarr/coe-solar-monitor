@@ -1,6 +1,6 @@
 /***************************************************
    ANFF OPV Solar Monitor
-   Date: 25-01-2024
+   Date: 29-01-2024
    Author: Matthew G. Barr
    Project: Bangkok OPV demonstrator
 
@@ -33,6 +33,7 @@ float voltage_V = 0;
 uint16_t current_mA = 0;
 float power_W = 0;
 float energy_Wh_d = 0;
+float energy_scaling_factor = 6.4;
 
 // Preallocated char arrays
 char current[6];
@@ -46,7 +47,7 @@ char power_label[8] = "Power: ";
 char power_units[2] = "W";
 char energy[6];
 char energy_label[9] = "Energy: ";
-char energy_units[8] = "Wh/day";
+char energy_units[10] = "Wh/m2/day";
 
 
 void setup(void) {
@@ -71,7 +72,7 @@ void setup(void) {
   delay(250);
 
   drawText(2, 31, 1, "Connecting serial..." ,ST77XX_WHITE, ST77XX_BLACK);
-  while (!Serial){
+  while (!Serial) {
     delay(10);
   }
 
@@ -112,13 +113,13 @@ void loop(void)
     power_W = voltage_V * current_mA / 1000;
     dtostrf(power_W, 5, 2, power);
 
-    energy_Wh_d = power_W * 9;
+    energy_Wh_d = power_W * energy_scaling_factor;
     dtostrf(energy_Wh_d, 5, 0 , energy);
 
     // Serial.print("Voltage: "); Serial.print(voltage_V, 1);  Serial.print(" V,   ");
     // Serial.print("Current: "); Serial.print(current_mA); Serial.print(" mA,   ");
     // Serial.print("Power: "); Serial.print(power_W); Serial.print(" W,   ");
-    // Serial.print("Energy: "); Serial.print(energy_Wh_d, 0); Serial.println(" Wh/day");
+    // Serial.print("Energy: "); Serial.print(energy_Wh_d, 0); Serial.println(" Wh/m2/day");
 
     drawText(2, 5, 1, voltage_label, ST77XX_WHITE, ST77XX_BLACK);
     drawText(50, 5, 1, voltage, ST77XX_WHITE, ST77XX_BLACK);
